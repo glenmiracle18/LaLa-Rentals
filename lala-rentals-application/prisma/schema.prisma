@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id // Matches Clerk User ID
+  role       UserRole  @default(RENTER)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Host relations
+  properties Property[] // Properties listed by the host
+  
+  // Renter relations
+  bookings   Booking[] // Bookings made by the renter
+
+  @@map("users")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  location    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  images      PropertyImage[]
+  host        User     @relation(fields: [hostId], references: [id])
+  hostId      String
+  bookings    Booking[]
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  url        String
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  @@map("property_images")
+}
+
+model Booking {
+  id           String       @id @default(cuid())
+  checkIn      DateTime
+  checkOut     DateTime
+  totalPrice   Float
+  status       BookingStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  property     Property     @relation(fields: [propertyId], references: [id])
+  propertyId   String
+  user         User         @relation(fields: [userId], references: [id])
+  userId       String
+  @@map("bookings")
+}
+
+enum UserRole {
+  HOST
+  RENTER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
