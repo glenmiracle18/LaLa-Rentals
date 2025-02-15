@@ -1,6 +1,6 @@
 import { Home } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   SignInButton,
   SignUpButton,
@@ -39,12 +39,18 @@ const Header = () => {
         </nav>
         <div className="ml-4">
           <SignedOut>
-            <SignInButton />
-            <SignUpButton />
+            <Link href="/sign-in" className={buttonVariants({ variant: "ghost" })}>
+              Sign In
+            </Link>
+            <Link href="/sign-up" className={buttonVariants({ variant: "default" })}>
+              Sign Up
+            </Link>
           </SignedOut>
 
           <SignedIn>
-            <UserButton />
+            <Link href="/dashboard" className={buttonVariants({ variant: "ghost" })}>
+              Dashboard
+            </Link>
           </SignedIn>
         </div>
       </div>
