@@ -1,9 +1,16 @@
+import { Button } from '@/components/ui/button'
 import React from 'react'
+import PropertyListingForm from './(components)/create-dialoge'
+
 
 const Dashboard = () => {
   return (
     <div>
-      Dashboardpage
+      <div className="flex gap-10">
+        Dashboardpage
+        <PropertyListingForm />
+      </div>
+    
     </div>
   )
 }
