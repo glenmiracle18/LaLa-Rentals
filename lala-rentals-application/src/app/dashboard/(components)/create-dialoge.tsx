@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -93,11 +92,12 @@ export default function PropertyListingForm() {
   // mutation
   const { mutate: createProperty, isPending } = useMutation({
     mutationFn: createListing,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Success",
         description: "Property listing created successfully",
       });
+      console.log(data)
       reset();
       setUploaded(false);
       setUploadedImages([]);
@@ -141,7 +141,6 @@ export default function PropertyListingForm() {
   
   const onSubmit = (data: FormData) => {
     if(!validateForm(data)) return;
-    // Make sure to properly structure the data
     const listingData: CreateListingData = {
       name: data.name,
       location: data.location,
@@ -150,11 +149,12 @@ export default function PropertyListingForm() {
       bedrooms: Number(data.bedrooms),
       bathrooms: Number(data.bathrooms),
       visitingDays: {
-        from: data.visitingDays.from,
-        to: data.visitingDays.to,
+        from: data.visitingDays.from, // Convert Date to string
+        to: data.visitingDays.to, 
       },
       images: uploadedImages,
     };
+    console.log("Success: ", listingData);
   
     createProperty(listingData);
   };
@@ -182,8 +182,6 @@ export default function PropertyListingForm() {
               onClientUploadComplete={(res) => {
                 // Do something with the response
                 setUploaded(true)
-
-                console.log("Files: ", res);
                 const newImages = res.map((file) => file.ufsUrl)
                 setUploadedImages((prev) => [...prev, ...newImages])
                 toast({

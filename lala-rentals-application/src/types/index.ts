@@ -3,8 +3,8 @@ export type CreateListingData = {
     name: string;
     location: string;
     visitingDays: {
-      from: Date;
-      to: Date;
+      from: Date; // Change to string for date serialization
+      to: Date;   // Change to string for date serialization
     };
     price: number;
     bedrooms: number;
@@ -12,3 +12,5 @@ export type CreateListingData = {
     description: string;
     images: string[];
   };
+
+  

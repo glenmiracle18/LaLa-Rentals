@@ -42,8 +42,8 @@ model Property {
   bookings    Booking[]
   bedrooms    Int
   bathrooms   Int
-  visitingDaysStart DateTime
-  visitingDaysEnd DateTime
+  visitingDaysStart DateTime  // Changed from visitingHoursStart
+  visitingDaysEnd   DateTime  // Changed from visitingHoursEnd
   @@map("properties")
 }
 

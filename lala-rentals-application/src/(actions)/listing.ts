@@ -5,7 +5,12 @@ import prisma from "@/lib/prisma";
 import { CreateListingData } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 
+
 export async function createListing(data: CreateListingData) {
+  if (!data) {
+    throw new Error("No data provided");
+  }
+
   try {
     const { userId } = await auth();
 
@@ -13,37 +18,43 @@ export async function createListing(data: CreateListingData) {
       throw new Error("Unauthorized");
     }
 
-    if (!data) {
-      throw new Error("No data provided");
-    }
+    console.log("Starting createListing with userId:", userId);
+    console.log("Received data:", JSON.stringify(data, null, 2));
 
-    const listing = await prisma.property.create({
-      data: {
-        title: data.name,
-        location: data.location,
-        description: data.description,
-        price: data.price,
-        bathrooms: data.bathrooms,
-        bedrooms: data.bedrooms,
-        visitingDaysStart: data.visitingDays.from,
-        visitingDaysEnd: data.visitingDays.to,
-        hostId: userId,
-        images: {
-          createMany: {
-            data: data.images.map((url) => ({
-              url,
-            })),
-          },
+
+    const prismaData = {
+      title: data.name,
+      location: data.location,
+      description: data.description,
+      price: Number(data.price),
+      bathrooms: Number(data.bathrooms),
+      bedrooms: Number(data.bedrooms),
+      visitingDaysStart: new Date(data.visitingDays.from),
+      visitingDaysEnd: new Date(data.visitingDays.to),
+      hostId: userId,
+      images: {
+        createMany: {
+          data: data.images.map((url: string) => ({
+            url,
+          })),
         },
       },
+    };
+
+    console.log("Attempting to create property with:", JSON.stringify(prismaData, null, 2));
+
+    const listing = await prisma.property.create({
+      data: prismaData,
       include: {
         images: true,
       },
     });
 
-    return listing;
-  } catch (error) {
-    console.error("[CREATE_LISTING]", error);
-    throw new Error(error instanceof Error ? error.message : "Failed to create listing");
-  }
+    console.log("Successfully created listing:", JSON.stringify(listing, null, 2));
+    return { success: true, data: listing };
+  } catch(error) {
+    if (error instanceof Error){
+        console.log("Error: ", error.stack)
+    }
+}
 }
