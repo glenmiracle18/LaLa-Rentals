@@ -40,6 +40,10 @@ model Property {
   host        User     @relation(fields: [hostId], references: [id])
   hostId      String
   bookings    Booking[]
+  bedrooms    Int
+  bathrooms   Int
+  visitingDaysStart DateTime
+  visitingDaysEnd DateTime
   @@map("properties")
 }
 

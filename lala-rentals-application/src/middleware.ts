@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextRequest } from 'next/server'
 
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
@@ -12,8 +13,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
+  '/api/uploadthing(.*)',
 ])
-
 
 
 export const config = {
@@ -24,3 +25,4 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
+

@@ -4,6 +4,7 @@ import { SearchForm } from "@/components/search-form"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -14,6 +15,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { House } from "lucide-react"
+import { UserButton } from "@clerk/nextjs"
 
 // This is sample data.
 const data = {
@@ -84,6 +86,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter className="flex items-start px-6 py-1.5 bg-slate-400/20 rounded-lg mx-6 my-4">
+        <UserButton />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
