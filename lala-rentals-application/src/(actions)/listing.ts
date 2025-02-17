@@ -52,3 +52,27 @@ export async function createListing(data: formDataTypes) {
     }
 }
 }
+
+
+export async function getCurrentHostProperties() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    const properties = await prisma.property.findMany({
+      where: {
+        hostId: userId,
+      },
+      include: {
+        images: true,
+      },
+    });
+    return { success: true, data: properties };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("Error: ", error.stack);
+    }
+  }
+}
+
