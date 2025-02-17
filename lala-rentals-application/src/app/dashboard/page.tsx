@@ -1,15 +1,28 @@
 "use client";
 import { Button } from '@/components/ui/button'
-import React from 'react'
-import PropertyListingForm from './(components)/create-dialoge'
+import React, { useEffect, useState } from 'react'
+import { CreatePropertyListingModal } from './(components)/create-dialoge';
+
 
 
 const Dashboard = () => {
+
+  const [ isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(true);
+  }, [])
+  
+  if(!isMounted) {
+    return null;
+  }
+
   return (
     <div>
-      <div className="flex gap-10 h-screen">
+      <div className="p-6">
         Dashboardpage
-        <PropertyListingForm />
+        <CreatePropertyListingModal />
       </div>
     
     </div>

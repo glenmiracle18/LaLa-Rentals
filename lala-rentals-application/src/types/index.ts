@@ -1,16 +1,11 @@
 // types/index.ts
-export type CreateListingData = {
-    name: string;
-    location: string;
-    visitingDays: {
-      from: Date; // Change to string for date serialization
-      to: Date;   // Change to string for date serialization
-    };
-    price: number;
-    bedrooms: number;
-    bathrooms: number;
-    description: string;
-    images: string[];
-  };
-
-  
+export type formDataTypes = {
+    title: string,
+    description: string,
+    price: string,
+    address: string,
+    bathrooms: number,
+    bedrooms: number,
+    visitingHours: string,
+    images: string[],
+  }

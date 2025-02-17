@@ -1,21 +1,10 @@
-import { useCallback, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import {
-  Upload,
-  Home,
-  MapPin,
-  Clock,
-  DollarSign,
-  Bed,
-  Bath,
-  FileText,
-  X,
-} from "lucide-react";
-import { format, set } from "date-fns";
+"use client"
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -24,409 +13,294 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
-import { OurFileRouter } from "@/app/api/uploadthing/core";
-import { useUploadThing } from "@/utils/uploadthing";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { createListing } from "@/(actions)/listing";
-import { CreateListingData } from "@/types";
+} from "@/components/ui/dialog"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useDropzone } from "react-dropzone"
+import { X } from "lucide-react"
+import { useUploadThing } from "@/utils/uploadthing"
+import { createListing } from "@/(actions)/listing"
+import { toast } from "@/hooks/use-toast"
+import { useMutation } from "@tanstack/react-query"
 
+const formSchema = z.object({
+  title: z.string().min(2, {
+    message: "Title must be at least 2 characters.",
+  }),
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters.",
+  }),
+  price: z.string().min(1,{
+    message: "Price must be at least 1 character.",
+  }),
+  address: z.string().min(5, {
+    message: "Address must be at least 5 characters.",
+  }),
+  bathrooms: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "Bathrooms must be a valid number.",
+  }),
+  bedrooms: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "Bedrooms must be a valid number.",
+  }),
+  visitingHours: z.string({
+    required_error: "Please select visiting hours.",
+  }),
+  images: z.array(z.instanceof(File)).min(1, {
+    message: "Please select at least one image.",
+  }),
+})
 
-type FormData = {
-  name: string;
-  location: string;
-  visitingDays: {
-    from: Date;
-    to: Date;
-  };
-  price: number;
-  bedrooms: number;
-  bathrooms: number;
-  description: string;
-  images: string[];
-};
+export function CreatePropertyListingModal() {
+  const [open, setOpen] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const { startUpload } = useUploadThing("imageUploader")
 
-export default function PropertyListingForm() {
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    reset,
-  } = useForm<FormData>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      visitingDays: {
-        from: undefined,
-        to: undefined,
-      }
-    }
-  });
+      title: "",
+      description: "",
+      price: "",
+      address: "",
+      visitingHours: "",
+      images: [],
+    },
+  })
 
-  const [files, setFiles] = useState<File[]>([]);
-  const [ uploaded, setUploaded ] = useState<boolean>(false);
-  const [ uploadedImages, setUploadedImages ] = useState<string[]>([]);
+  const { setValue, watch } = form
+  const images = watch("images")
 
-  const handleRemoveFile = (fileName: string) => {
-    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
-  };
+  const onDrop = (acceptedFiles: File[]) => {
+    setValue("images", acceptedFiles, { shouldValidate: true })
+  }
 
-  // mutation
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+    },
+  })
+
+  const removeImage = (index: number) => {
+    setValue(
+      "images",
+      images.filter((_, i) => i !== index),
+      { shouldValidate: true },
+    )
+  }
+
   const { mutate: createProperty, isPending } = useMutation({
-    mutationFn: createListing,
-    onSuccess: (data) => {
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const uploadedImages = await startUpload(values.images)
+      if (!uploadedImages) throw new Error("Failed to upload images")
+      
+      const imageUrls = uploadedImages.map(image => image.ufsUrl)
+
+      console.log(imageUrls)
+      
+      return createListing({
+        title: values.title,
+        description: values.description,
+        price: values.price,
+        address: values.address,
+        bathrooms: Number(values.bathrooms), 
+        bedrooms: Number(values.bedrooms),
+        visitingHours: values.visitingHours,
+        images: imageUrls
+      })
+    },
+    onSuccess: () => {
       toast({
         title: "Success",
-        description: "Property listing created successfully",
-      });
-      console.log(data)
-      reset();
-      setUploaded(false);
-      setUploadedImages([]);
-      handleDialogOpen();
+        description: "Property created successfully"
+      })
+    setOpen(false)
+      form.reset()
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
+        description: error.message,
+        variant: "destructive"
+      })
     }
-  });
-  
-  const handleDialogOpen = useCallback(() => {
-    setOpen((prev) => !prev);
-  }, []);
+   })
 
-  // validation
-  const validateForm = (data: FormData) => {
-    if (!uploadedImages.length) {
-      toast({
-        title: "Error",
-        description: "Please upload at least one image",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    if (!data.visitingDays.from || !data.visitingDays.to) {
-      toast({
-        title: "Error",
-        description: "Please select visiting days",
-        variant: "destructive",
-      });
-      return false;
-    }
-  
-    return true;
-  };
-  
-  const onSubmit = (data: FormData) => {
-    if(!validateForm(data)) return;
-    const listingData: CreateListingData = {
-      name: data.name,
-      location: data.location,
-      description: data.description,
-      price: Number(data.price),
-      bedrooms: Number(data.bedrooms),
-      bathrooms: Number(data.bathrooms),
-      visitingDays: {
-        from: data.visitingDays.from, // Convert Date to string
-        to: data.visitingDays.to, 
-      },
-      images: uploadedImages,
-    };
-    console.log("Success: ", listingData);
-  
-    createProperty(listingData);
-  };
-
-
+   async function onSubmit(values: z.infer<typeof formSchema>) {
+    createProperty(values)
+   }
+   
   return (
-    <Dialog open={open} onOpenChange={handleDialogOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add new property</Button>
+        <Button variant="outline">Create Property Listing</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Property Listing</DialogTitle>
-          <DialogDescription>
-            Fill in the details below to create a new property listing. Click
-            save when you're done.
-          </DialogDescription>
+          <DialogTitle>Create Property Listing</DialogTitle>
+          <DialogDescription>Fill in the details for your new property listing.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <div className="w-full h-[250px]">
-            <UploadDropzone
-              endpoint="imageUploader"
-              onClientUploadComplete={(res) => {
-                // Do something with the response
-                setUploaded(true)
-                const newImages = res.map((file) => file.ufsUrl)
-                setUploadedImages((prev) => [...prev, ...newImages])
-                toast({
-                  title: "🚀 Upload Complete",
-                })
-              }}
-             
-              onUploadError={(error: Error) => {
-                setUploaded(false)
-                console.log("Error: ", error);
-                toast({
-                  title: "🚀 Upload Error",
-                  description: error.message
-                })
-              }}
-              onUploadBegin={(name) => {
-                // Do something once upload begins
-                console.log("Uploading: ", name);
-                toast({title: "🚀 Uploading: ", description: `${name}`}) ;
-              }}
-              onChange={(acceptedFiles) => {
-                // Do something with the accepted files
-                setFiles(acceptedFiles);
-                console.log("Accepted files: ", acceptedFiles);
-              }}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Cozy apartment in the city center" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="A beautiful apartment with modern amenities..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <Input placeholder="1000" {...field} />
+                  </FormControl>
+                  <FormDescription>Price per month in USD</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="123 Main St, City, State, ZIP" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="bedrooms"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Beedrooms</FormLabel>
+                  <FormControl>
+                    <Input placeholder="4" {...field} type="number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
-            </div>
+            <FormField
+              control={form.control}
+              name="bathrooms"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bathrooms</FormLabel>
+                  <FormControl>
+                    <Input placeholder="2" {...field} type="number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Property Name</Label>
-                <div className="relative">
-                  <Home className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="name"
-                    placeholder="Enter property name"
-                    className="pl-8"
-                    {...register("name", {
-                      required: "Property name is required",
-                    })}
-                  />
-                </div>
-                {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
-                )}
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    placeholder="Enter property location"
-                    className="pl-8"
-                    {...register("location", {
-                      required: "Location is required",
-                    })}
-                  />
-                </div>
-                {errors.location && (
-                  <p className="text-sm text-red-500">
-                    {errors.location.message}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label>Visiting Days</Label>
-              <div className="flex space-x-2">
-                <Controller
-                  name="visitingDays.from"
-                  control={control}
-                  rules={{ required: "Start date is required" }}
-                  render={({ field }) => (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          <Clock className="mr-2 h-4 w-4" />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>From date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                />
-                <Controller
-                  name="visitingDays.to"
-                  control={control}
-                  rules={{ required: "End date is required" }}
-                  render={({ field }) => (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          <Clock className="mr-2 h-4 w-4" />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>To date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                />
-              </div>
-              {(errors.visitingDays?.from || errors.visitingDays?.to) && (
-                <p className="text-sm text-red-500">
-                  Both start and end dates are required
-                </p>
+            <FormField
+              control={form.control}
+              name="visitingHours"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Visiting Hours</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select visiting hours" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="morning">9 AM - 12 PM</SelectItem>
+                      <SelectItem value="afternoon">1 PM - 5 PM</SelectItem>
+                      <SelectItem value="evening">6 PM - 8 PM</SelectItem>
+                      <SelectItem value="weekend">Weekends 10 AM - 4 PM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="price">Price</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="price"
-                  placeholder="Enter price"
-                  type="number"
-                  className="pl-8"
-                  {...register("price", {
-                    required: "Price is required",
-                    min: { value: 0, message: "Price must be positive" },
-                  })}
-                />
-              </div>
-              {errors.price && (
-                <p className="text-sm text-red-500">{errors.price.message}</p>
+            />
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Images</FormLabel>
+                  <FormControl>
+                    <div>
+                      <div
+                        {...getRootProps()}
+                        className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer"
+                      >
+                        <input {...getInputProps()} />
+                        <p>Drag 'n' drop some images here, or click to select images</p>
+                      </div>
+                      {images.length > 0 && (
+                        <div className="mt-4 flex flex-row gap-2">
+                          {images.map((file, index) => (
+                            <div key={index} className="relative ">
+                              <div className="flex items-center gap-2">
+                              <img
+                                src={URL.createObjectURL(file) || "/placeholder.svg"}
+                                alt={`preview ${index}`}
+                                className="w-20 h-20 object-cover rounded-md"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                              >
+                                <X size={12} />
+                              </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormDescription>Upload up to 5 images of your property</FormDescription>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex space-x-4">
-              <div className="flex flex-col space-y-1.5 flex-1">
-                <Label htmlFor="bedrooms">Bedrooms</Label>
-                <div className="relative">
-                  <Bed className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="bedrooms"
-                    placeholder="Number of bedrooms"
-                    type="number"
-                    className="pl-8"
-                    {...register("bedrooms", {
-                      required: "Number of bedrooms is required",
-                      min: { value: 0, message: "Must be 0 or more" },
-                    })}
-                  />
-                </div>
-                {errors.bedrooms && (
-                  <p className="text-sm text-red-500">
-                    {errors.bedrooms.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col space-y-1.5 flex-1">
-                <Label htmlFor="bathrooms">Bathrooms</Label>
-                <div className="relative">
-                  <Bath className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="bathrooms"
-                    placeholder="Number of bathrooms"
-                    type="number"
-                    className="pl-8"
-                    {...register("bathrooms", {
-                      required: "Number of bathrooms is required",
-                      min: { value: 0, message: "Must be 0 or more" },
-                    })}
-                  />
-                </div>
-                {errors.bathrooms && (
-                  <p className="text-sm text-red-500">
-                    {errors.bathrooms.message}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="description">Description</Label>
-            <div className="relative">
-              <FileText className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Textarea
-                id="description"
-                placeholder="Enter property description"
-                className="pl-8"
-                {...register("description", {
-                  required: "Description is required",
-                })}
-              />
-            </div>
-            {errors.description && (
-              <p className="text-sm text-red-500">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-        </form>
-        <DialogFooter className="flex items-end">
-        <Button 
-          type="submit" 
-          onClick={handleSubmit(onSubmit)} 
-          disabled={!uploaded || isPending}
-        >
-          {isPending ? "Creating..." : "Save Property Listing"}
-        </Button>
-        {!uploaded && (
-          <p className="text-orange-400 text-sm font-serif">
-            Upload an image to complete property listing
-          </p>
-        )}
-      </DialogFooter>
+            />
+            <DialogFooter>
+              <Button type="submit" disabled={isUploading}>
+                {isPending ? "Uploading..." : "Create Listing"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
+

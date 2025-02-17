@@ -19,11 +19,14 @@ CREATE TABLE "properties" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
+    "price" TEXT NOT NULL,
     "location" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "hostId" TEXT NOT NULL,
+    "bedrooms" INTEGER NOT NULL,
+    "bathrooms" INTEGER NOT NULL,
+    "visitingHours" TEXT NOT NULL,
 
     CONSTRAINT "properties_pkey" PRIMARY KEY ("id")
 );
