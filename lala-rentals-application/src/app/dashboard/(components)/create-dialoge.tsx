@@ -24,6 +24,7 @@ import { useUploadThing } from "@/utils/uploadthing"
 import { createListing } from "@/(actions)/listing"
 import { toast } from "@/hooks/use-toast"
 import { useMutation } from "@tanstack/react-query"
+import { useOptimistic } from 'react'
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -56,7 +57,7 @@ export function CreatePropertyListingModal() {
   const [open, setOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const { startUpload } = useUploadThing("imageUploader")
-
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -131,7 +132,7 @@ export function CreatePropertyListingModal() {
    async function onSubmit(values: z.infer<typeof formSchema>) {
     createProperty(values)
    }
-   
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

@@ -18,23 +18,12 @@ const Header = () => {
           <span className="font-bold">LaLa Rentals</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
+          
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
-            href="#"
+            href="/listings"
           >
-            Search
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            href="#"
-          >
-            How It Works
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            href="#"
-          >
-            About Us
+            Listings
           </Link>
         </nav>
         <div className="ml-4">

@@ -1,8 +1,9 @@
 import Image from "next/image"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Bed, Bath, Clock } from "lucide-react"
+import Link from "next/link"
 
 interface Property {
   id: string
@@ -45,12 +46,12 @@ export function PropertyCard({ property }: { property: Property }) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center">
+      <CardFooter className="flex justify-between items-center" >
         <div className="flex items-center text-sm text-muted-foreground">
           <Clock className="w-4 h-4 mr-1" />
           {property.visitingHours}
         </div>
-        <Button variant="outline">View Details</Button>
+        <Link href={`/property/${property.id}`} className={buttonVariants({ variant:"default" })}>View Details</Link>
       </CardFooter>
     </Card>
   )

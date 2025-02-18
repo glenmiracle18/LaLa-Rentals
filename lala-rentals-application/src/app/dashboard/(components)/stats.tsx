@@ -1,5 +1,5 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
-import { useGetCurrentHostProperties } from '@/hooks/listings/use-current-host-properties';
+
 import { CircleDollarSign, Home, Tag } from 'lucide-react'
 import React from 'react'
 

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useGetCurrentHostProperties() {
  return useQuery({
-   queryKey: ["properties"],
+   queryKey: ["all propeties"],
    queryFn: getCurrentHostProperties,
  });
 }

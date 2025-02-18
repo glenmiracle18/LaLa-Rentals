@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma";
 import { formDataTypes } from "@/types";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 
 export async function createListing(data: formDataTypes) {
@@ -45,6 +46,7 @@ export async function createListing(data: formDataTypes) {
     });
 
     console.log("Successfully created listing:", JSON.stringify(listing, null, 2));
+    revalidatePath("/dashboard");
     return { success: true, data: listing };
   } catch(error) {
     if (error instanceof Error){
@@ -73,6 +75,46 @@ export async function getCurrentHostProperties() {
     if (error instanceof Error) {
       console.log("Error: ", error.stack);
     }
+  }
+}
+
+// get all propeties
+export async function getAllPropeties() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    const properties = await prisma.property.findMany({
+      include: {
+        images: true,
+      },
+    });
+    return { success: true, data: properties };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("Error: ", error.stack);
+    }
+  }
+}
+
+export async function getPropertybyId(id: string) {
+  try {
+    const property = await prisma.property.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        images: true,
+      },
+    });
+    // revalidatePath("/property/[id]");
+    return { success: true, data: property };
+  } catch(error) {
+    if (error instanceof Error) {
+      console.log("Error: ", error.stack);
+    }
+    
   }
 }
 
