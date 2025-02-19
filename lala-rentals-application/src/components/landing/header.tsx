@@ -37,9 +37,12 @@ const Header = () => {
           </SignedOut>
 
           <SignedIn>
+            <div className="flex items-center gap-4">
             <Link href="/dashboard" className={buttonVariants({ variant: "ghost" })}>
               Dashboard
             </Link>
+            <UserButton />
+            </div>
           </SignedIn>
         </div>
       </div>

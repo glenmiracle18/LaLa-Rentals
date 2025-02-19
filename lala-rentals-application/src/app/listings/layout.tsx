@@ -27,8 +27,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
       <SidebarProvider defaultOpen={defaultOpen}>
         {/* <AppSidebar /> */}
-    <html lang="en">
-      <body
+      <div
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* <SidebarTrigger /> */}
@@ -36,8 +35,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <div className="p-8">
         {children}
         </div>
-      </body>
-    </html>
+      </div>
     </ SidebarProvider>
   );
 }

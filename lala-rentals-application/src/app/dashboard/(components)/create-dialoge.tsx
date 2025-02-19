@@ -136,7 +136,7 @@ export function CreatePropertyListingModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Property Listing</Button>
+        <Button variant="default" className="bg-gradient-to-r from-green-600 to-yellow-600">Create Property Listing</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

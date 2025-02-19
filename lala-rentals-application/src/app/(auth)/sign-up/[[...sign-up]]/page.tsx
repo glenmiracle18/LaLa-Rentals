@@ -18,7 +18,7 @@ const SignUpPage = () => {
           path="/sign-up"
           routing="path"
           signInUrl="/sign-in"
-          afterSignUpUrl="/listing"
+          fallbackRedirectUrl="/listing"
           unsafeMetadata={{
             role: selectedRole,
           }}
