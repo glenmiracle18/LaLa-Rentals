@@ -1,5 +1,4 @@
 "use client"
-
 import { PropertyCard } from "../dashboard/(components)/propety-card"
 import { useQuery } from "@tanstack/react-query"
 import { getAllPropeties } from "@/(actions)/listing"

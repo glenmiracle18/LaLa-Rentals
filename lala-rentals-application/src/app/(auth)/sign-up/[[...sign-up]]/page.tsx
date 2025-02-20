@@ -13,7 +13,7 @@ const SignUpPage = () => {
 
   if (showSignUp) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-green-600 to bg-orange-300">
         <SignUp 
           path="/sign-up"
           routing="path"
@@ -28,7 +28,7 @@ const SignUpPage = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-green-600 to bg-orange-300">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Choose Your Role</CardTitle>

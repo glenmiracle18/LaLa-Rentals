@@ -1,3 +1,4 @@
+"use client"
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { Button, buttonVariants } from "../ui/button";
@@ -7,9 +8,16 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
 
+type roleProps = "RENTER" | "HOST"
+
 const Header = () => {
+  const { user } = useUser()
+  const role: roleProps = user?.unsafeMetadata.role as roleProps
+
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -37,12 +45,21 @@ const Header = () => {
           </SignedOut>
 
           <SignedIn>
+            { role === "RENTER" ? (
+              <div className="flex items-center gap-4">
+                <Link href="/" className={buttonVariants({ variant: "ghost" })}>
+                  About
+                </Link>
+                <UserButton />
+              </div>
+            ): (
             <div className="flex items-center gap-4">
             <Link href="/dashboard" className={buttonVariants({ variant: "ghost" })}>
               Dashboard
             </Link>
             <UserButton />
             </div>
+            )}
           </SignedIn>
         </div>
       </div>

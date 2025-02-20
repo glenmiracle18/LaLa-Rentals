@@ -1,6 +1,6 @@
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
-import { WebhookEvent } from '@clerk/nextjs/server'
+import { clerkClient, WebhookEvent } from '@clerk/nextjs/server'
 import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
@@ -52,15 +52,34 @@ export async function POST(req: Request) {
   const eventType = evt.type
 
 
+  const client = await clerkClient();
+  if(!id){
+    throw new Error("No user id found")
+  }
+
+  
+  
+  const user = await client.users.getUser(id);
+  const username = user.fullName;
+  const profileImage = user.imageUrl;
+  const email = user.primaryEmailAddress?.emailAddress;
+  const userId = user.id;
+  // console.log(user);
+
   if (eventType === "user.created") {
     const { id, unsafe_metadata } = evt.data;
     const role = unsafe_metadata?.role as "HOST" | "RENTER";
-
+    console.log(`User ${id} created with role ${role}`);
+    console.log(id)
+   
     // Create a new user in your database
     await prisma.user.create({
       data: {
-        id,
+        id: userId,
         role,
+        username: username || '',
+        profileImage: profileImage || '',
+        email: email || '',
       },
     });
   }

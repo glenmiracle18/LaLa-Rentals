@@ -1,4 +1,4 @@
-// actions/booking.ts
+
 "use server"
 
 import prisma from "@/lib/prisma";
@@ -98,10 +98,45 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
             ]
           } : {})
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
   
       return { success: true, booked: !!booking, data: booking};
   
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("Error: ", error.stack);
+        throw error;
+      }
+    }
+  }
+
+  export async function recentBookings() {
+    try {
+      const { userId } = await auth();
+  
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+  
+      const bookings = await prisma.booking.findMany({
+        where: {
+          property:{
+            hostId: userId,
+          }
+        },
+        include: {
+          property: true,
+          user: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      });
+  
+      return { success: true, data: bookings };
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error: ", error.stack);

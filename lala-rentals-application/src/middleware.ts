@@ -1,21 +1,34 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextRequest } from 'next/server'
+import { auth, clerkMiddleware, createRouteMatcher, currentUser, User } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { clerkClient } from "@clerk/nextjs/server";
 
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect()
-  }
-})
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/listing(.*)'])
+    const { userId } = await auth();
+    if (userId) {
+      const client = await clerkClient();
+      const role = (await client.users.getUser(userId)).unsafeMetadata.role;
+
+      if (isProtectedRoute(request) && role === 'RENTER') {
+        const url = new URL('/listings', request.url);
+        return NextResponse.redirect(url.toString(), {status: 308});
+      }
+
+      console.log("redirect to dashboard");
+    }
+  }
+});
+
+const isProtectedRoute = createRouteMatcher(['/dashboard(.*)',]);
 
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
   '/api/uploadthing(.*)',
-])
-
+]);
 
 export const config = {
   matcher: [
@@ -24,5 +37,4 @@ export const config = {
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-}
-
+};

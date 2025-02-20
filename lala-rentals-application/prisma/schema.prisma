@@ -18,9 +18,12 @@ model User {
   role      UserRole @default(RENTER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  username  String
+  email     String
+  profileImage String
 
   // Host relations
-  properties Property[] // Properties listed by the host
+  // properties Property[] // Properties listed by the host
 
   // Renter relations
   bookings Booking[] // Bookings made by the renter
@@ -37,7 +40,7 @@ model Property {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   images        PropertyImage[]
-  host          User            @relation(fields: [hostId], references: [id])
+  // host          User            @relation(fields: [hostId], references: [id])
   hostId        String
   bookings      Booking[]
   bedrooms      Int

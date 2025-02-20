@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 import { cookies } from "next/headers";
 import DashSidebar from "./(components)/sidebar";
+import ProtectedHostRoute from "@/providers/session-route-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   return (
+    // <ProtectedHostRoute> 
+    // no need to use session route provider, since the job is already done by the middleware file in /src
       <SidebarProvider defaultOpen={defaultOpen}>
         {/* <AppSidebar /> */}
       <div
@@ -39,5 +42,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
        </DashSidebar>
       </div>
     </ SidebarProvider>
+    // </ProtectedHostRoute>
   );
 }
