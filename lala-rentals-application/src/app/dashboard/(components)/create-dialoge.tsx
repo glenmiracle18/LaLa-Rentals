@@ -24,7 +24,6 @@ import { useUploadThing } from "@/utils/uploadthing"
 import { createListing } from "@/(actions)/listing"
 import { toast } from "@/hooks/use-toast"
 import { useMutation } from "@tanstack/react-query"
-import { useOptimistic } from 'react'
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -33,7 +32,7 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "Description must be at least 10 characters.",
   }),
-  price: z.string().min(1,{
+  price: z.string().min(1, {
     message: "Price must be at least 1 character.",
   }),
   address: z.string().min(5, {
@@ -57,7 +56,7 @@ export function CreatePropertyListingModal() {
   const [open, setOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const { startUpload } = useUploadThing("imageUploader")
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -96,206 +95,217 @@ export function CreatePropertyListingModal() {
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       const uploadedImages = await startUpload(values.images)
       if (!uploadedImages) throw new Error("Failed to upload images")
-      
-      const imageUrls = uploadedImages.map(image => image.ufsUrl)
 
-      console.log(imageUrls)
-      
+      const imageUrls = uploadedImages.map((image) => image.ufsUrl)
+
       return createListing({
         title: values.title,
         description: values.description,
         price: values.price,
         address: values.address,
-        bathrooms: Number(values.bathrooms), 
+        bathrooms: Number(values.bathrooms),
         bedrooms: Number(values.bedrooms),
         visitingHours: values.visitingHours,
-        images: imageUrls
+        images: imageUrls,
       })
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Property created successfully"
+        description: "Property created successfully",
       })
-    setOpen(false)
+      setOpen(false)
       form.reset()
     },
     onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       })
-    }
-   })
+    },
+  })
 
-   async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     createProperty(values)
-   }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="bg-gradient-to-r from-green-600 to-yellow-600">Create Property Listing</Button>
+        <Button
+          variant="default"
+          className="bg-gradient-to-r from-green-600 to-yellow-600 hover:from-green-700 hover:to-yellow-700 text-white font-semibold"
+        >
+          Create Property Listing
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create Property Listing</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Create Property Listing</DialogTitle>
           <DialogDescription>Fill in the details for your new property listing.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Cozy apartment in the city center" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="A beautiful apartment with modern amenities..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input placeholder="1000" {...field} />
-                  </FormControl>
-                  <FormDescription>Price per month in USD</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="123 Main St, City, State, ZIP" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bedrooms"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Beedrooms</FormLabel>
-                  <FormControl>
-                    <Input placeholder="4" {...field} type="number" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Cozy apartment in the city center" {...field} className="w-full" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="A beautiful apartment with modern amenities..."
+                          {...field}
+                          className="w-full h-32"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input placeholder="1000" {...field} className="w-full" />
+                      </FormControl>
+                      <FormDescription>Price per month in USD</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main St, City, State, ZIP" {...field} className="w-full" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <FormField
-              control={form.control}
-              name="bathrooms"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bathrooms</FormLabel>
-                  <FormControl>
-                    <Input placeholder="2" {...field} type="number" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="visitingHours"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Visiting Hours</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select visiting hours" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="morning">9 AM - 12 PM</SelectItem>
-                      <SelectItem value="afternoon">1 PM - 5 PM</SelectItem>
-                      <SelectItem value="evening">6 PM - 8 PM</SelectItem>
-                      <SelectItem value="weekend">Weekends 10 AM - 4 PM</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="images"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Images</FormLabel>
-                  <FormControl>
-                    <div>
-                      <div
-                        {...getRootProps()}
-                        className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer"
-                      >
-                        <input {...getInputProps()} />
-                        <p>Drag 'n' drop some images here, or click to select images</p>
-                      </div>
-                      {images.length > 0 && (
-                        <div className="mt-4 flex flex-row gap-2">
-                          {images.map((file, index) => (
-                            <div key={index} className="relative ">
-                              <div className="flex items-center gap-2">
-                              <img
-                                src={URL.createObjectURL(file) || "/placeholder.svg"}
-                                alt={`preview ${index}`}
-                                className="w-20 h-20 object-cover rounded-md"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeImage(index)}
-                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                              >
-                                <X size={12} />
-                              </button>
-                              </div>
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="bedrooms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrooms</FormLabel>
+                      <FormControl>
+                        <Input placeholder="4" {...field} type="number" className="w-full" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bathrooms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bathrooms</FormLabel>
+                      <FormControl>
+                        <Input placeholder="2" {...field} type="number" className="w-full" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="visitingHours"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Visiting Hours</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select visiting hours" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="morning">9 AM - 12 PM</SelectItem>
+                          <SelectItem value="afternoon">1 PM - 5 PM</SelectItem>
+                          <SelectItem value="evening">6 PM - 8 PM</SelectItem>
+                          <SelectItem value="weekend">Weekends 10 AM - 4 PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Images</FormLabel>
+                      <FormControl>
+                        <div>
+                          <div
+                            {...getRootProps()}
+                            className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                          >
+                            <input {...getInputProps()} />
+                            <p>Drag 'n' drop some images here, or click to select images</p>
+                          </div>
+                          {images.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {images.map((file, index) => (
+                                <div key={index} className="relative">
+                                  <img
+                                    src={URL.createObjectURL(file) || "/placeholder.svg"}
+                                    alt={`preview ${index}`}
+                                    className="w-20 h-20 object-cover rounded-md"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormDescription>Upload up to 5 images of your property</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      </FormControl>
+                      <FormDescription>Upload up to 5 images of your property</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
             <DialogFooter>
-              <Button type="submit" disabled={isUploading}>
-                {isPending ? "Uploading..." : "Create Listing"}
+              <Button type="submit" disabled={isUploading || isPending} className="w-full sm:w-auto">
+                {isPending ? "Creating..." : "Create Listing"}
               </Button>
             </DialogFooter>
           </form>

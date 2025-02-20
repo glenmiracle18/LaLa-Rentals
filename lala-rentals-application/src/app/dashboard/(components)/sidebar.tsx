@@ -35,7 +35,9 @@ export default function DashSidebar({ children }: { children: React.ReactNode })
             </BreadcrumbList>
           </Breadcrumb>
         </header>
+        <div className="w-full">
         {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   return (
     
-    <div className='p-6'>
+    <div className='p-6 w-full'>
       <div className="px-6 my-4 flex justify-between items-center">
         Welcome to your dashboard
         <CreatePropertyListingModal />

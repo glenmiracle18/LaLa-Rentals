@@ -51,20 +51,35 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
       if (!userId) {
         throw new Error("Unauthorized");
       }
-  
-      const booking = await prisma.booking.updateMany({
-        where: {
-          id: bookingId,
-          userId,
-        },
-        data: {
-          status,
-        },
+
+      const existingBooking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { property: true }
       });
+
+      if (!existingBooking) {
+        return { success: false, message: "Booking not found" };
+      }
+
+      // Verify the user is the host of the property
+      if (existingBooking.property.hostId !== userId) {
+        return { success: false, message: "Unauthorized: Not the property host" };
+      }
   
-      console.log("Successfully updated booking status:", JSON.stringify(booking, null, 2));
+      const updatedBooking = await prisma.booking.update({
+        where: { id: bookingId },
+        data: { status },
+        include: {
+          property: true,
+          user: true
+        }
+      });
+
+
+  
+      console.log("Successfully updated booking status:", JSON.stringify(updatedBooking, null, 2));
       revalidatePath("/dashboard");
-      return { success: true, data: booking };
+      return { success: true, data: existingBooking };
     } catch (error) {
       if (error instanceof Error) {
         console.log("Error: ", error.stack);

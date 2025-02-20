@@ -5,7 +5,6 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 import { cookies } from "next/headers";
 import DashSidebar from "./(components)/sidebar";
-import ProtectedHostRoute from "@/providers/session-route-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +30,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <SidebarProvider defaultOpen={defaultOpen}>
         {/* <AppSidebar /> */}
       <div
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
       >
         {/* <SidebarTrigger /> */}
        <DashSidebar>
