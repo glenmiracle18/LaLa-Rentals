@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDropzone } from "react-dropzone"
-import { X } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { useUploadThing } from "@/utils/uploadthing"
 import { createListing } from "@/(actions)/listing"
 import { toast } from "@/hooks/use-toast"
@@ -135,10 +135,14 @@ export function CreatePropertyListingModal() {
       <DialogTrigger asChild>
         <Button
           variant="default"
-          className="bg-gradient-to-r from-green-600 to-yellow-600 hover:from-green-700 hover:to-yellow-700 text-white font-semibold"
+          size="lg"
+          className="h-14 px-6 text-lg font-semibold"
         >
+                <Plus className="mr-2 h-6 w-6" />
+
           Create Property Listing
         </Button>
+        
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -248,10 +252,10 @@ export function CreatePropertyListingModal() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="morning">9 AM - 12 PM</SelectItem>
-                          <SelectItem value="afternoon">1 PM - 5 PM</SelectItem>
-                          <SelectItem value="evening">6 PM - 8 PM</SelectItem>
-                          <SelectItem value="weekend">Weekends 10 AM - 4 PM</SelectItem>
+                          <SelectItem value="9 AM - 12 PM">9 AM - 12 PM</SelectItem>
+                          <SelectItem value="1 PM - 5 PM">1 PM - 5 PM</SelectItem>
+                          <SelectItem value="6 PM - 8 PM">6 PM - 8 PM</SelectItem>
+                          <SelectItem value="Weekends 10 AM - 4 PM">Weekends 10 AM - 4 PM</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

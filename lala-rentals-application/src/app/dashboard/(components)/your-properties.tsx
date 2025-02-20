@@ -7,12 +7,19 @@ import { Button } from "@/components/ui/button"
 import { Pencil } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import { EditPropertyModal } from './edit-properts'
+import { Property } from '@prisma/client'
+import { on } from 'events'
 
-const YourProperties = () => {
-  const { data: properties, isLoading } = useGetCurrentHostProperties()
-  const [editingProperty, setEditingProperty] = useState<string>("")
+interface YourPropertiesProps {
+  data: Property[];
+  propertiesLoading: boolean;
+  onEditComplete: () => void;
+}
 
-  if (isLoading) {
+const YourProperties = ({ data, propertiesLoading, onEditComplete}: YourPropertiesProps) => {
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null)
+
+  if (propertiesLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-full" />
@@ -37,7 +44,7 @@ const YourProperties = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {properties?.data.map((property) => (
+            {data.map((property) => (
               <TableRow key={property.id}>
                 <TableCell className="font-medium">{property.title}</TableCell>
                 <TableCell>{property.location}</TableCell>
@@ -48,7 +55,7 @@ const YourProperties = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setEditingProperty(property.title)}
+                    onClick={() => setEditingProperty(property)}
                   >
                     <Pencil className="h-4 w-4 mr-2" />
                     Edit
@@ -62,7 +69,8 @@ const YourProperties = () => {
       {editingProperty && (
         <EditPropertyModal
           property={editingProperty}
-          onClose={() => setEditingProperty("")}
+          onClose={() => setEditingProperty(null)}
+          onEditComplete={() => onEditComplete()}
         />
       )}
     </div>

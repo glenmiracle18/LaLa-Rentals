@@ -5,6 +5,9 @@ import prisma from "@/lib/prisma";
 import { formDataTypes } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { type Property, type Prisma } from '@prisma/client';
+
+
 
 
 export async function createListing(data: formDataTypes) {
@@ -118,3 +121,160 @@ export async function getPropertybyId(id: string) {
   }
 }
 
+
+interface UpdateResponse {
+  success: boolean;
+  data?: Property;
+  error?: string;
+}
+
+
+export async function updateProperty(data: Property & { images?: any } & { id: string }): Promise<UpdateResponse> {
+  try {
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      images,
+      ...updateData
+    } = data;
+
+    const property = await prisma.property.update({
+      where: { 
+        id: id 
+      },
+      data: {
+        ...updateData,
+        updatedAt: new Date(), // Automatically update the timestamp
+      },
+    });
+
+    return { 
+      success: true, 
+      data: property 
+    };
+
+  } catch(error) {
+    // Log the error for debugging
+    if (error instanceof Error) {
+      console.error("Error updating property:", error.stack);
+    }
+
+    // Return a structured error response
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unknown error occurred'
+    };
+  }
+}
+
+interface DeleteResponse {
+  success: boolean;
+  data?: Property;
+  error?: string;
+}
+
+export async function deleteProperty(id: string): Promise<DeleteResponse> {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return {
+        success: false,
+        error: "Unauthorized"
+      };
+    }
+
+    // Verify the property exists and belongs to the user
+    const existingProperty = await prisma.property.findUnique({
+      where: { id },
+      select: { hostId: true }
+    });
+
+    if (!existingProperty) {
+      return {
+        success: false,
+        error: "Property not found"
+      };
+    }
+
+    if (existingProperty.hostId !== userId) {
+      return {
+        success: false,
+        error: "You don't have permission to delete this property"
+      };
+    }
+
+    // Delete the property
+    const property = await prisma.property.delete({
+      where: { id }
+    });
+
+    return { 
+      success: true, 
+      data: property 
+    };
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error deleting property:", error.stack);
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An unknown error occurred"
+    };
+  }
+}
+
+
+export interface StatsData {
+  totalProperties: number;
+  activeBookings: number;
+  totalRevenue: number;
+  occupancyRate: number;
+}
+
+export async function getStats(): Promise<StatsData> {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const properties = await prisma.property.findMany({
+      where: {
+        hostId: userId
+      },
+      include: {
+        bookings: true
+      }
+    });
+
+    const totalProperties = properties.length;
+    const activeBookings = properties.reduce(
+      (total, property) => total + property.bookings.length,
+      0
+    );
+
+    // Calculate total revenue from all property prices
+    const totalRevenue = properties.reduce(
+      (total, property) => total + parseFloat(property.price),
+      0
+    );
+
+    // Calculate occupancy rate
+    const occupancyRate = totalProperties === 0 ? 0 : (activeBookings / totalProperties) * 100;
+
+    return {
+      totalProperties,
+      activeBookings,
+      totalRevenue,
+      occupancyRate
+    };
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    throw error;
+  }
+}

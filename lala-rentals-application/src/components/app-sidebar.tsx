@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 
 import { SearchForm } from "@/components/search-form"
@@ -15,7 +16,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { House } from "lucide-react"
-import { UserButton } from "@clerk/nextjs"
+import { UserButton, useUser } from "@clerk/nextjs"
 
 // This is sample data.
 const data = {
@@ -29,18 +30,6 @@ const data = {
           title: "Properties",
           url: "#",
         },
-        {
-          title: "Sales",
-          url: "#",
-        },
-        {
-          title: "Data",
-          url: "#",
-        },
-        {
-          title: "Plans",
-          url: "#",
-        },
       ],
     },
    
@@ -48,7 +37,11 @@ const data = {
   ],
 }
 
+
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const username = useUser().user?.fullName
+  const email = useUser().user?.primaryEmailAddress?.toString()
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -86,9 +79,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="flex items-start px-6 py-1.5 bg-slate-400/20 rounded-lg mx-6 my-4">
+      <SidebarFooter className="px-2 py-4">
+      <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors border border-border">
         <UserButton />
-      </SidebarFooter>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{username}</span>
+          <span className="text-xs text-muted-foreground">{email}</span>
+        </div>
+      </div>
+    </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

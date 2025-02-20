@@ -52,6 +52,8 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
         throw new Error("Unauthorized");
       }
 
+      // no need to verify if the user is a host, since we already did that at the middleware
+
       const existingBooking = await prisma.booking.findUnique({
         where: { id: bookingId },
         include: { property: true }
@@ -159,3 +161,6 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
       }
     }
   }
+
+
+  
