@@ -136,7 +136,7 @@ export function CreatePropertyListingModal() {
         <Button
           variant="default"
           size="lg"
-          className="h-14 px-6 text-lg font-semibold"
+          className="h-14 px-6 text-md font-semibold font-mono"
         >
                 <Plus className="mr-2 h-6 w-6" />
 

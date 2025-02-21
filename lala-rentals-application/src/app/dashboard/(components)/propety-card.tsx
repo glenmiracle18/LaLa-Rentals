@@ -48,7 +48,7 @@ export function PropertyCard({ property }: { property: Property }) {
           objectFit="cover"
         />
         <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
-          ${property.price}/night
+          ${property.price}/month
         </Badge>
       </div>
       <CardHeader>
@@ -77,17 +77,6 @@ export function PropertyCard({ property }: { property: Property }) {
           <Clock className="w-4 h-4 mr-1" />
           {property.visitingHours}
         </div>
-        {/* <Link
-          href={`/property/${property.id}`}
-          className={buttonVariants({
-            variant: isBooked?.success ? "outline" : "default",
-            className: `${
-              isBooked?.success ? "pointer-events-none opacity-50" : ""
-            }`,
-          })}
-        >
-          {isBooked?.success ? `${isBooked.data?.status}` : "View Details"}
-        </Link> */}
         <Link
           href={`/property/${property.id}`}
           className={buttonVariants({

@@ -43,7 +43,7 @@ const Listings = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Properties</h1>
+      <h1 className="text-3xl font-bold mb-6 font-mono">Properties</h1>
       {properties?.data && properties.data.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.data.map((property) => (
@@ -51,7 +51,7 @@ const Listings = () => {
           ))}
         </div>
       ) : (
-        <Alert>
+        <Alert variant='destructive' className="font-mono">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No properties found</AlertTitle>
           <AlertDescription>

@@ -20,7 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { isPropertyBooked } from "@/(actions)/booking";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PropertyPage({
   params,
@@ -67,7 +67,7 @@ export default function PropertyPage({
 
   if (!property || !property.data) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
+      <div className="container mx-auto px-4 py-8 text-center w-full font-mono">
         <h1 className="text-3xl font-bold text-gray-800">Property not found</h1>
         <p className="mt-4 text-gray-600">
           The property you're looking for doesn't exist or has been removed.
@@ -116,56 +116,57 @@ export default function PropertyPage({
           </div>
         </div>
 
-        <Card className="p-6 space-y-6">
-          <CardContent className="space-y-6">
-            <div className="flex items-center space-x-2 text-lg">
-              <MapPin className="text-primary" />
-              <span className="text-gray-700">{property.data.location}</span>
-            </div>
+        <Card className="w-full max-w-md overflow-hidden hover:shadow-lg transition-shadow">
+      <CardContent className="p-6 space-y-6">
+        {/* Location */}
+        <div className="flex items-center space-x-2 text-muted-foreground">
+          <MapPin className="h-5 w-5 text-primary" />
+          <span className="text-lg">456 Ocean Dr, Miami, FL</span>
+        </div>
 
-            <div className="flex items-center space-x-4 text-lg">
-              <div className="flex items-center">
-                <Bed className="mr-2 text-primary" />
-                <span className="text-gray-700">
-                  {property.data.bedrooms} Bedrooms
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Bath className="mr-2 text-primary" />
-                <span className="text-gray-700">
-                  {property.data.bathrooms} Bathrooms
-                </span>
-              </div>
-            </div>
+        {/* Property Details */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <Bed className="h-5 w-5 text-primary" />
+            <span className="text-lg">2 Bedrooms</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Bath className="h-5 w-5 text-primary" />
+            <span className="text-lg">2 Bathrooms</span>
+          </div>
+        </div>
 
-            <div className="flex items-center space-x-2 text-lg">
-              <Clock className="text-primary" />
-              <span className="text-gray-700">
-                Visiting Hours: {property.data.visitingHours}
-              </span>
-            </div>
+        {/* Visiting Hours */}
+        <div className="flex items-center space-x-2 text-muted-foreground">
+          <Clock className="h-5 w-5 text-primary" />
+          <span>Visiting Hours: Weekends 10 AM - 4 PM</span>
+        </div>
 
-            <div className="flex items-center space-x-2 text-3xl font-bold">
-              <DollarSign className="text-primary" />
-              <span className="text-gray-900">{property.data.price}</span>
-              <span className="text-xl text-gray-600 font-normal" />
-            </div>
+        {/* Price */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline space-x-1">
+            <span className="text-4xl font-bold">$1200</span>
+            <span className="text-muted-foreground">/month</span>
+          </div>
+          <Badge variant="secondary" className="text-sm">
+            Available Now
+          </Badge>
+        </div>
+      </CardContent>
 
-            <Button
-              size="lg"
-              onClick={() => setIsBookingModalOpen(true)}
-              className="w-full"
-            >
-              Book Now
-            </Button>
+      <CardFooter className="p-6 pt-0 flex flex-col space-y-4">
+        <Button className="w-full text-lg h-12" size="lg" onClick={() => setIsBookingModalOpen(true)}>
+          Book Now
+        </Button>
 
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Star className="text-yellow-400" />
-              <span>4.9 (120 reviews)</span>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center space-x-2 text-muted-foreground">
+          <Star className="h-5 w-5 fill-primary text-primary" />
+          <span className="text-sm">4.9 (120 reviews)</span>
+        </div>
+      </CardFooter>
+    </Card>
       </div>
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
@@ -210,7 +211,7 @@ export default function PropertyPage({
         <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-800">
-              Previous Bookings
+              Your Recent Bookings
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -271,13 +272,13 @@ export default function PropertyPage({
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Host</h2>
             <div className="flex items-center space-x-4">
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                {/* <Image
+                <Image
                   src="/placeholder-user.jpg"
                   alt="Host"
                   layout="fill"
                   objectFit="cover"
                   className="rounded-full"
-                /> */}
+                />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">

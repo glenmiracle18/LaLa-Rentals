@@ -4,7 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { recentBookings, updateBookingStatus } from "@/(actions)/booking";
-import { AlertCircle, Calendar, DollarSign } from "lucide-react";
+import { AlertCircle, AlertOctagon, Calendar, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +53,7 @@ const UpdateBookingModal: React.FC<{
         title: "Success",
         description: `Booking status updated to ${data?.data?.status.toLowerCase()}`,
       });
-      
+
       onUpdateComplete();
       setIsOpen(false);
     },
@@ -79,7 +79,21 @@ const UpdateBookingModal: React.FC<{
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update Booking Status</DialogTitle>
+          <DialogTitle className="space-y-4">
+            <h2 className="text-2xl font-semibold">Update Booking Status</h2>
+            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-foreground">Username:</span>
+                <Badge variant="secondary" className="font-mono">
+                  {booking.user.username}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-foreground">Email:</span>
+                <span className="font-mono">{booking.user.email}</span>
+              </div>
+            </div>
+          </DialogTitle>
         </DialogHeader>
         <div className="flex justify-between mt-4">
           <Button
@@ -132,6 +146,21 @@ const RecentBookings: React.FC = () => {
       <div className="flex items-center flex-col justify-center h-96 bg-slate-100 rounded-lg">
         <h2 className="text-2xl font-bold mb-4">There was an error</h2>
         <AlertCircle className="w-10 h-10 text-red-500" />
+      </div>
+    );
+  }
+
+  if (!myBookings?.data.length) {
+    return (
+      <div className="w-full">
+        <div>
+          <h2 className="text-2xl font-bold">Recent Bookings</h2>
+        </div>
+        <div className="py-4 h-[300px] bg-gray-400/10 flex justify-center items-center rounded-lg flex-col font-mono my-4">
+          <AlertOctagon />
+          <p>No Recent Bookings</p>
+          <p>When Someone books, you will see it here</p>
+        </div>
       </div>
     );
   }

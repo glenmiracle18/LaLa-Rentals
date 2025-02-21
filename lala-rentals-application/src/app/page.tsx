@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Pacifico } from "next/font/google"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { motion } from "framer-motion";
+import { Pacifico } from "next/font/google";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   SignInButton,
   SignUpButton,
@@ -13,12 +13,13 @@ import {
   UserButton,
   useUser,
 } from "@clerk/nextjs";
+import { SoundButton } from "@/components/sound-button";
 
 const pacifico = Pacifico({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-pacifico",
-})
+});
 
 function ElegantShape({
   className,
@@ -28,12 +29,12 @@ function ElegantShape({
   rotate = 0,
   gradient = "from-white/[0.08]",
 }: {
-  className?: string
-  delay?: number
-  width?: number
-  height?: number
-  rotate?: number
-  gradient?: string
+  className?: string;
+  delay?: number;
+  width?: number;
+  height?: number;
+  rotate?: number;
+  gradient?: string;
 }) {
   return (
     <motion.div
@@ -78,15 +79,20 @@ function ElegantShape({
             "backdrop-blur-[2px] border-2 border-white/[0.15]",
             "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]",
             "after:absolute after:inset-0 after:rounded-full",
-            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]",
+            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]"
           )}
         />
       </motion.div>
     </motion.div>
-  )
+  );
 }
 
+type roleProps = "RENTER" | "HOST";
+
 export default function LalaRentalsHero() {
+  const { user } = useUser();
+  const role: roleProps = user?.unsafeMetadata.role as roleProps;
+
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
@@ -98,7 +104,7 @@ export default function LalaRentalsHero() {
         ease: [0.25, 0.4, 0.25, 1],
       },
     }),
-  }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex flex-col overflow-hidden bg-[#030303]">
@@ -107,12 +113,52 @@ export default function LalaRentalsHero() {
         <Link href="/" className="text-white text-2xl font-bold">
           Lala Rentals
         </Link>
+        <SignedOut>
+
         <div className="space-x-4">
-          <Link href="/sign-up" className="text-white border-white hover:bg-white hover:text-black">
+          <Link
+            href="/sign-up"
+            className="text-white border-white hover:bg-white hover:text-black"
+          >
             Sign In
           </Link>
-          <Link href="/sign-in" className={buttonVariants({ variant: "default"})}>Sign Up</Link>
+          <Link
+            href="/sign-in"
+            className={buttonVariants({ variant: "default" })}
+          >
+            Sign Up
+          </Link>
         </div>
+        </SignedOut>
+        <SignedIn>
+        {role === "RENTER" ? (
+          <div className="flex items-center gap-4">
+            <UserButton />
+            <Link
+              href="/listings"
+              className={buttonVariants({ variant: "default" })}
+            >
+              Listings
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard"
+              className={buttonVariants({ variant: "default" })}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/listings"
+              className={buttonVariants({ variant: "default" })}
+            >
+              Listings
+            </Link>
+            <UserButton />
+          </div>
+        )}
+        </SignedIn>
       </header>
 
       {/* Hero Content */}
@@ -121,7 +167,7 @@ export default function LalaRentalsHero() {
 
         <div className="absolute inset-0 overflow-hidden">
           <ElegantShape
-            delay={0.3}
+            delay={0.1}
             width={600}
             height={140}
             rotate={12}
@@ -168,14 +214,21 @@ export default function LalaRentalsHero() {
 
         <div className="relative z-10 container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
-            <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
+            <motion.div
+              custom={1}
+              variants={fadeUpVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">Find Your</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
+                  Find Your
+                </span>
                 <br />
                 <span
                   className={cn(
                     "bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300 ",
-                    pacifico.className,
+                    pacifico.className
                   )}
                 >
                   Dream Home
@@ -183,16 +236,31 @@ export default function LalaRentalsHero() {
               </h1>
             </motion.div>
 
-            <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
+            <motion.div
+              custom={2}
+              variants={fadeUpVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-                Discover the perfect rental property for your lifestyle with Lala Rentals. Your new home is just a click
-                away.
+                Discover the perfect rental property for your lifestyle with
+                Lala Rentals. Your new home is just a click away.
               </p>
             </motion.div>
 
-            <motion.div custom={3} variants={fadeUpVariants} initial="hidden" animate="visible">
-              <Link href='/listings' className="bg-white text-black hover:bg-white/90 text-lg px-8 py-6 rounded-[40px]">
-                See Properties
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              <Link
+                href="/listings"
+                className="group relative inline-flex items-center justify-center px-8 py-4 font-medium tracking-wide text-white transition-all duration-500 bg-transparent border-2 border-white/20 rounded-full hover:bg-white/10 backdrop-blur-sm"
+              >
+                <span className="relative">
+                  View Properties
+                  <span className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-violet-400 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                </span>
               </Link>
             </motion.div>
           </div>
@@ -203,9 +271,10 @@ export default function LalaRentalsHero() {
 
       {/* Footer */}
       <footer className="relative z-20 w-full py-4 px-6 text-center text-white/60 text-sm">
-        &copy; 2025 Glen Submission
+
+        &copy; 2025 Glen Miracle LaLa Submission
+        <SoundButton />
       </footer>
     </div>
-  )
+  );
 }
-

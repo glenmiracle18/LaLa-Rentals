@@ -14,6 +14,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Property, Prisma } from "@prisma/client";
 import { deleteProperty, updateProperty } from "@/(actions)/listing";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditPropertyModalProps {
   property: Property;
@@ -121,7 +128,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
+              <Label htmlFor="price">Price/month</Label>
               <Input
                 id="price"
                 name="price"
@@ -171,13 +178,29 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="visitingHours">Visiting Hours</Label>
-            <Input
+            {/* <Input
               id="visitingHours"
               name="visitingHours"
               value={formData.visitingHours}
               onChange={handleChange}
               required
-            />
+            /> */}
+            <Select
+              onValueChange={() => handleChange}
+              defaultValue={formData.visitingHours}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select visiting hours" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="9 AM - 12 PM">9 AM - 12 PM</SelectItem>
+                <SelectItem value="1 PM - 5 PM">1 PM - 5 PM</SelectItem>
+                <SelectItem value="6 PM - 8 PM">6 PM - 8 PM</SelectItem>
+                <SelectItem value="Weekends 10 AM - 4 PM">
+                  Weekends 10 AM - 4 PM
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="mt-6 flex justify-end space-x-2">
