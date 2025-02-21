@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Pacifico } from "next/font/google";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,11 +12,12 @@ import {
 } from "@clerk/nextjs";
 import { SoundButton } from "@/components/sound-button";
 
-const pacifico = Pacifico({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-pacifico",
-});
+// import { Pacifico } from "next/font/google";
+// const pacifico = Pacifico({
+//   subsets: ["latin"],
+//   weight: ["400"],
+//   variable: "--font-pacifico",
+// });
 
 function ElegantShape({
   className,
@@ -226,7 +226,7 @@ export default function LalaRentalsHero() {
                 <span
                   className={cn(
                     "bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300 ",
-                    pacifico.className
+                    // pacifico.className
                   )}
                 >
                   Dream Home
