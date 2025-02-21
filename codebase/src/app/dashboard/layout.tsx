@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { cookies } from "next/headers";
 import DashSidebar from "./(components)/sidebar";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -24,14 +13,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   return (
-    // <ProtectedHostRoute> 
-    // no need to use session route provider, since the job is already done by the middleware file in /src
       <SidebarProvider defaultOpen={defaultOpen}>
-        {/* <AppSidebar /> */}
-      <div
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full`}
-      >
-        {/* <SidebarTrigger /> */}
+        <div
+          className="antialiased w-full"
+        >
        <DashSidebar>
         <div className="p-8">
 
@@ -40,6 +25,5 @@ export default async function Layout({ children }: { children: React.ReactNode }
        </DashSidebar>
       </div>
     </ SidebarProvider>
-    // </ProtectedHostRoute>
   );
 }
