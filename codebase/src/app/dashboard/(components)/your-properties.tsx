@@ -1,14 +1,12 @@
 "use client"
 
 import React, { useState } from 'react'
-import { useGetCurrentHostProperties } from '@/hooks/listings/use-current-host-properties'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { AlertOctagon, Pencil } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import { EditPropertyModal } from './edit-properts'
 import { Property } from '@prisma/client'
-import { on } from 'events'
 
 interface YourPropertiesProps {
   data: Property[];

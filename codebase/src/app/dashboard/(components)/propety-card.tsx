@@ -7,11 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import {  buttonVariants } from "@/components/ui/button";
 import { Bed, Bath, Clock } from "lucide-react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { isPropertyBooked } from "@/(actions)/booking";
 
 interface Property {
   id: string;
@@ -26,17 +24,6 @@ interface Property {
 }
 
 export function PropertyCard({ property }: { property: Property }) {
-  const { data: isBooked, isError: isBookedError } = useQuery({
-    queryKey: ["isBooked", property.id],
-    queryFn: async () => {
-      const response = await isPropertyBooked(property.id);
-      if (!response) {
-        throw new Error("Failed to check booking status");
-      }
-      return response;
-    },
-    enabled: !!property.id,
-  });
 
   return (
     <Card className="overflow-hidden">

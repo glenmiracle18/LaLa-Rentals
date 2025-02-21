@@ -1,5 +1,5 @@
-import { auth, clerkMiddleware, createRouteMatcher, currentUser, User } from '@clerk/nextjs/server'
-import { NextRequest, NextResponse } from 'next/server'
+import {  clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 import { clerkClient } from "@clerk/nextjs/server";
 
 export default clerkMiddleware(async (auth, request) => {

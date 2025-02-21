@@ -7,8 +7,6 @@ import {
   Bath,
   MapPin,
   Clock,
-  DollarSign,
-  User,
   Star,
   CalendarDays,
   ArrowRight,
@@ -70,7 +68,7 @@ export default function PropertyPage({
       <div className="container mx-auto px-4 py-8 text-center w-full font-mono">
         <h1 className="text-3xl font-bold text-gray-800">Property not found</h1>
         <p className="mt-4 text-gray-600">
-          The property you're looking for doesn't exist or has been removed.
+          The property you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
       </div>
     );

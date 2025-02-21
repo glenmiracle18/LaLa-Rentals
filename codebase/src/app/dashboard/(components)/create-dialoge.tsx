@@ -54,7 +54,7 @@ const formSchema = z.object({
 
 export function CreatePropertyListingModal() {
   const [open, setOpen] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
+  const [isUploading] = useState(false)
   const { startUpload } = useUploadThing("imageUploader")
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -117,7 +117,7 @@ export function CreatePropertyListingModal() {
       setOpen(false)
       form.reset()
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error.message,
@@ -265,7 +265,7 @@ export function CreatePropertyListingModal() {
                 <FormField
                   control={form.control}
                   name="images"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Images</FormLabel>
                       <FormControl>
@@ -275,7 +275,7 @@ export function CreatePropertyListingModal() {
                             className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:border-gray-400 transition-colors"
                           >
                             <input {...getInputProps()} />
-                            <p>Drag 'n' drop some images here, or click to select images</p>
+                            <p>Drag&apos;n&apos;drop some images here, or click to select images</p>
                           </div>
                           {images.length > 0 && (
                             <div className="mt-4 flex flex-wrap gap-2">

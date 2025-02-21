@@ -1,8 +1,3 @@
-import {
-  generateUploadButton,
-  generateUploadDropzone,
-  generateUploader
-} from "@uploadthing/react";
 import { generateReactHelpers } from "@uploadthing/react"
 
 

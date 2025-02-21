@@ -5,10 +5,7 @@ import prisma from "@/lib/prisma";
 import { formDataTypes } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { type Property, type Prisma } from '@prisma/client';
-
-
-
+import { type Property } from '@prisma/client';
 
 export async function createListing(data: formDataTypes) {
   if (!data) {
@@ -58,7 +55,6 @@ export async function createListing(data: formDataTypes) {
 }
 }
 
-
 export async function getCurrentHostProperties() {
   try {
     const { userId } = await auth();
@@ -81,7 +77,6 @@ export async function getCurrentHostProperties() {
   }
 }
 
-// get all propeties
 export async function getAllPropeties() {
   try {
     const { userId } = await auth();
@@ -111,16 +106,13 @@ export async function getPropertybyId(id: string) {
         images: true,
       },
     });
-    // revalidatePath("/property/[id]");
     return { success: true, data: property };
   } catch(error) {
     if (error instanceof Error) {
       console.log("Error: ", error.stack);
     }
-    
   }
 }
-
 
 interface UpdateResponse {
   success: boolean;
@@ -128,14 +120,10 @@ interface UpdateResponse {
   error?: string;
 }
 
-
-export async function updateProperty(data: Property & { images?: any } & { id: string }): Promise<UpdateResponse> {
+export async function updateProperty(data: Property & { id: string }): Promise<UpdateResponse> {
   try {
     const {
       id,
-      createdAt,
-      updatedAt,
-      images,
       ...updateData
     } = data;
 
@@ -155,12 +143,10 @@ export async function updateProperty(data: Property & { images?: any } & { id: s
     };
 
   } catch(error) {
-    // Log the error for debugging
     if (error instanceof Error) {
       console.error("Error updating property:", error.stack);
     }
 
-    // Return a structured error response
     return {
       success: false,
       error: error instanceof Error ? error.message : 'An unknown error occurred'
@@ -185,7 +171,6 @@ export async function deleteProperty(id: string): Promise<DeleteResponse> {
       };
     }
 
-    // Verify the property exists and belongs to the user
     const existingProperty = await prisma.property.findUnique({
       where: { id },
       select: { hostId: true }
@@ -205,7 +190,6 @@ export async function deleteProperty(id: string): Promise<DeleteResponse> {
       };
     }
 
-    // Delete the property
     const property = await prisma.property.delete({
       where: { id }
     });
@@ -226,7 +210,6 @@ export async function deleteProperty(id: string): Promise<DeleteResponse> {
     };
   }
 }
-
 
 export interface StatsData {
   totalProperties: number;
@@ -258,13 +241,11 @@ export async function getStats(): Promise<StatsData> {
       0
     );
 
-    // Calculate total revenue from all property prices
     const totalRevenue = properties.reduce(
       (total, property) => total + parseFloat(property.price),
       0
     );
 
-    // Calculate occupancy rate
     const occupancyRate = totalProperties === 0 ? 0 : (activeBookings / totalProperties) * 100;
 
     return {

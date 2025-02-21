@@ -1,8 +1,7 @@
 'use client';
 
-import { getStats, StatsData } from '@/(actions)/listing';
+import { StatsData } from '@/(actions)/listing';
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
-import { useQuery } from '@tanstack/react-query'
 import { CircleDollarSign, Home, Tag, Users } from 'lucide-react';
 
 interface StatsProps {

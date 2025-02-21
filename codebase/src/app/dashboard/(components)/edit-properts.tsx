@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Property, Prisma } from "@prisma/client";
+import type { Property } from "@prisma/client";
 import { deleteProperty, updateProperty } from "@/(actions)/listing";
 import { toast } from "@/hooks/use-toast";
 import {

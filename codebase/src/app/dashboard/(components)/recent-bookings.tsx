@@ -57,7 +57,7 @@ const UpdateBookingModal: React.FC<{
       onUpdateComplete();
       setIsOpen(false);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to update booking status",

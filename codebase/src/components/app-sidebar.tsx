@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar"
 import { House } from "lucide-react"
 import { UserButton, useUser } from "@clerk/nextjs"
+import Link from "next/link"
 
 // This is sample data.
 const data = {
@@ -49,14 +50,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <a href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2">
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <House className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-semibold">LaLa Rentals</span>
               </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
         <SearchForm />
       </SidebarHeader>

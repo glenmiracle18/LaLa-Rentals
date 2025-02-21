@@ -4,7 +4,6 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { title } from "process";
 
 export async function createBooking(propertyId: string, checkIn: string, checkOut: string, totalPrice: number) {
   try {

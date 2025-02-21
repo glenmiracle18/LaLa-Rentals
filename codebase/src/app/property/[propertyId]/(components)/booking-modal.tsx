@@ -74,7 +74,7 @@ export function BookingModal({
       onClose()
       onBookingSuccess()
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Booking Failed",
         description: error.message,
