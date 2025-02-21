@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {
-  ClerkProvider,
-} from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from "@/components/ui/toaster";
-import {
-  QueryClientProvider,
-  QueryClient,
-} from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import TanstackProvider from "@/providers/TanstackProvider";
-
-const queryClient = new QueryClient();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,18 +26,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <TanstackProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-        {children}
-        <Toaster />
-      </TanstackProvider>
+        <ClerkProvider>
+          <TanstackProvider>
+            {children}
+            <Toaster />
+          </TanstackProvider>
+        </ClerkProvider>
       </body>
     </html>
-    </ClerkProvider>
   );
 }
